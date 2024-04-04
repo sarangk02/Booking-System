@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password
 
 from . import serializers
 from . import models
@@ -19,10 +20,39 @@ class UserView(APIView):
         data = request.data
         serializer = serializers.UserSerializer(data=data)
         if serializer.is_valid():
-            serializer.password = data.get('password')
+            serializer.validated_data['password'] = make_password(data.get('password'))
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+    def put(self, request):
+        data = request.data
+        user = models.CustomUser.objects.get(username=data.get('username'))
+        serializer = serializers.UserSerializer(user, data=data)
+        if serializer.is_valid():
+            if data.get('password'):
+                serializer.validated_data['password'] = make_password(data.get('password'))
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def patch(self, request):
+        data = request.data
+        user = models.CustomUser.objects.get(username=data.get('username'))
+        serializer = serializers.UserSerializer(user, data=data, partial=True)
+        if serializer.is_valid():
+            if data.get('password'):
+                serializer.validated_data['password'] = make_password(data.get('password'))
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request):
+        data = request.data
+        user = models.CustomUser.objects.get(username=data.get('username'))
+        user.delete()
+        return Response({'message': 'User deleted successfully!'})
+
 
 # {
 #     "username": "sarangkulkarniii",
