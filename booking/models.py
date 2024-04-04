@@ -14,7 +14,6 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, username, password):
         user = self.create_user(username, password)
-        user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
         return user
@@ -30,12 +29,15 @@ class CustomUser(AbstractUser, PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     contact_verified = models.BooleanField(default=False)
 
-    is_staff = models.BooleanField(default=False)
-
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
+
+    class Meta:
+        ordering = ['username']
+        verbose_name = 'user'
+        verbose_name_plural = 'users'
 
     def __str__(self):
         return self.username
