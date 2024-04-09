@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin, AbstractBaseUser
-
-# create custom user model here
+from django.utils import timezone
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
@@ -43,3 +42,43 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+
+class Slot(models.Model):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    payment_image = models.ImageField(upload_to='payment_images/', blank=True, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    request_time = models.DateTimeField(default=timezone.now, editable=False)
+    is_booked = models.BooleanField(default=False)
+    is_booked_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['request_time']
+        verbose_name = 'slot'
+        verbose_name_plural = 'slots'
+
+    def __str__(self):
+        return str(self.date.strftime('%D')) + ' | ' + str(self.start_time.strftime('%H')) + ' to ' + str(self.end_time.strftime('%H')) + ' | ' + str(self.user)
+
+# class DeletedSlot(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     date = models.DateField()
+#     start_time = models.TimeField()
+#     end_time = models.TimeField()
+#     payment_image = models.ImageField(upload_to='payment_images/', blank=True, null=True)
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     request_time = models.DateTimeField(default=timezone.now, editable=False)
+#     is_booked = models.BooleanField(default=False)
+#     is_booked_time = models.DateTimeField(blank=True, null=True)
+#     reason = models.TextField()
+
+#     class Meta:
+#         ordering = ['request_time']
+#         verbose_name = 'deleted slot'
+#         verbose_name_plural = 'deleted slots'
+
+#     def __str__(self):
+#         return str(self.date.strftime('%D')) + ' | ' + str(self.start_time.strftime('%H')) + ' to ' + str(self.end_time.strftime('%H')) + ' | ' + str(self.user)
