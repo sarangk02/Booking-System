@@ -42,7 +42,7 @@ class UserEdit(APIView):
     def patch(self, request):
         data = request.data
         user = models.CustomUser.objects.get(username=request.user)
-        serializer = serializers.UserSerializer(user, data=data, partial=True)
+        serializer = serializers.UserEditSerializer(user, data=data, partial=True)
         if serializer.is_valid():
             if data.get('password'):
                 serializer.validated_data['password'] = make_password(data.get('password'))

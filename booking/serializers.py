@@ -7,7 +7,12 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = models.CustomUser
-        fields = ['username','password','name','email','contact','emerg_name','emerg_contact','gender','email_verified','contact_verified']
+        fields = ['username','password','name','email','contact','emerg_name','emerg_contact','gender']
+
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CustomUser
+        fields = ['name','email','contact','emerg_name','emerg_contact','gender']
 
 class SlotSerializer(serializers.ModelSerializer):
     # payment_image = serializers.ImageField(required=True)
@@ -19,4 +24,3 @@ class SlotEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Slot
         fields = ['id','date','start_time','end_time','is_booked']
-
