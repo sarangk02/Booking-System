@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
 
 from . import serializers
 from . import models
@@ -16,6 +17,7 @@ class IndexView(APIView):
             '/users': {'GET': 'get details of user (Authorized only)', 'POST': 'create a new user', 'PATCH': 'update user details (Authorized only)', 'DELETE': 'delete user (Authorized only)'},
             '/manage-slot (Authorized only)': {'GET':'get details of slots as per User and Staff','POST': 'book a new slot','PATCH': 'update slot details (Staff)', 'DELETE': 'delete slot'},
             '/slot-requests (Authorized only)': {'GET':'slot-requests as per User and Staff', 'PATCH': 'book a slot (Staff)', 'DELETE': 'delete slot (Staff)'},
+            '/payment-images/?slotid= (Authorized only)': {'GET':'payment image of a slot (Staff only)'}
         }
         return Response(payload, status=200)
 
@@ -83,7 +85,7 @@ class Slots(APIView):
         serializer = serializers.SlotSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=201)
+            return Response({'Details':serializer.data, 'message':'Slot Request Sent successfully!'}, status=201)
         return Response(serializer.errors, status=400)
 
     def patch(self, request):

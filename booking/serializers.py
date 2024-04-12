@@ -15,10 +15,10 @@ class UserEditSerializer(serializers.ModelSerializer):
         fields = ['name','email','contact','emerg_name','emerg_contact','gender']
 
 class SlotSerializer(serializers.ModelSerializer):
-    # payment_image = serializers.ImageField(required=True)
+    id = serializers.IntegerField(read_only=True)
     class Meta:
         model = models.Slot
-        fields = ['date','start_time','end_time','payment_image','user']
+        fields = ['id','date','start_time','end_time','payment_image','user']
 
 class SlotEditSerializer(serializers.ModelSerializer):
     class Meta:

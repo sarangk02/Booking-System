@@ -49,7 +49,13 @@ class Slot(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    payment_image = models.ImageField(upload_to='payment_images/', blank=True, null=True)
+    # custom image name while saving
+    def payment_image_path(instance, filename):
+        date = instance.date.strftime("%d")+'-'+instance.date.strftime("%m")+'-'+instance.date.strftime("%y")
+        start_time = instance.start_time.strftime('%H')
+        end_time = instance.end_time.strftime('%H')
+        return f'payment_images/{date}_from_{start_time}_to_{end_time}_{instance.user.username}_{filename}'
+    payment_image = models.ImageField(upload_to=payment_image_path, blank=False, null=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     request_time = models.DateTimeField(default=timezone.now, editable=False)
     is_booked = models.BooleanField(default=False)
