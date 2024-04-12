@@ -20,7 +20,8 @@ class SlotSerializer(serializers.ModelSerializer):
         model = models.Slot
         fields = ['id','date','start_time','end_time','payment_image','user']
 
-class SlotEditSerializer(serializers.ModelSerializer):
+class UserSlotEditSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     class Meta:
         model = models.Slot
-        fields = ['id','date','start_time','end_time','is_booked']
+        fields = ['id','date','start_time','end_time']

@@ -92,7 +92,7 @@ class Slots(APIView):
         if request.user.is_staff:
             data = request.data
             slot = models.Slot.objects.get(id=data.get('id'))
-            serializer = serializers.SlotEditSerializer(slot, data=data, partial=True)
+            serializer = serializers.UserSlotEditSerializer(slot, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
@@ -149,11 +149,6 @@ class SlotReqeusts(APIView):
             return Response({'message': 'You are not authorized to perform this action!'}, status=403)
 
 # {
-# "id":2,
-# "is_booked":true
-# }
-
-# {
 #     "username": "sarangkulkarniii",
 #     "password": "asdf@1234",
 #     "name": "Sarang Kulkarni",
@@ -164,11 +159,4 @@ class SlotReqeusts(APIView):
 #     "gender": "M",
 #     "email_verified": False,
 #     "contact_verified": False
-# }
-
-# {
-#     "date": "2021-10-10",
-#     "start_time": "08:00:00",
-#     "end_time": "09:00:00",
-#     "payment_image": null
 # }
