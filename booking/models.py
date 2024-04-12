@@ -68,26 +68,23 @@ class Slot(models.Model):
     def __str__(self):
         return str(self.date.strftime('%D')) + ' | ' + str(self.start_time.strftime('%H')) + ' to ' + str(self.end_time.strftime('%H')) + ' | ' + str(self.user)
 
-# class DeletedSlot(models.Model):
-#     def payment_image_path(instance, filename):
-#         date = instance.date.strftime("%d")+'-'+instance.date.strftime("%m")+'-'+instance.date.strftime("%y")
-#         start_time = instance.start_time.strftime('%H')
-#         end_time = instance.end_time.strftime('%H')
-#         return f'del_payment_images/{date}_from_{start_time}_to_{end_time}_{instance.user.username}_{filename}'
-#     id = models.AutoField(primary_key=True)
-#     date = models.DateField()
-#     start_time = models.TimeField()
-#     end_time = models.TimeField()
-#     payment_image = models.ImageField(upload_to=payment_image_path, blank=True, null=True)
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-#     request_time = models.DateTimeField(default=timezone.now, editable=False)
-#     deletiontime = models.DateTimeField(default=timezone.now, editable=False)
-#     reason = models.TextField()
+class DeletedSlot(models.Model):
+    def payment_image_path(instance, filename):
+        return ''
+    id = models.AutoField(primary_key=True)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    payment_image = models.ImageField(upload_to=payment_image_path, blank=True, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    request_time = models.DateTimeField(editable=False)
+    deletiontime = models.DateTimeField(default=timezone.now, editable=False)
+    reason = models.TextField()
 
-#     class Meta:
-#         ordering = ['request_time']
-#         verbose_name = 'Deleted Slot'
-#         verbose_name_plural = 'Deleted Slots'
+    class Meta:
+        ordering = ['deletiontime']
+        verbose_name = 'Deleted Slot'
+        verbose_name_plural = 'Deleted Slots'
 
-#     def __str__(self):
-#         return str(self.date.strftime('%D')) + ' | ' + str(self.start_time.strftime('%H')) + ' to ' + str(self.end_time.strftime('%H')) + ' | ' + str(self.user)
+    def __str__(self):
+        return str(self.date.strftime('%D')) + ' | ' + str(self.start_time.strftime('%H')) + ' to ' + str(self.end_time.strftime('%H')) + ' | ' + str(self.user)

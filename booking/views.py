@@ -17,7 +17,6 @@ class IndexView(APIView):
             '/users': {'GET': 'get details of user (Authorized only)', 'POST': 'create a new user', 'PATCH': 'update user details (Authorized only)', 'DELETE': 'delete user (Authorized only)'},
             '/manage-slot (Authorized only)': {'GET':'get details of slots as per User and Staff','POST': 'book a new slot','PATCH': 'update slot details (Staff)', 'DELETE': 'delete slot'},
             '/slot-requests (Authorized only)': {'GET':'slot-requests as per User and Staff', 'PATCH': 'book a slot (Staff)', 'DELETE': 'delete slot (Staff)'},
-            '/payment-images/?slotid= (Authorized only)': {'GET':'payment image of a slot (Staff only)'}
         }
         return Response(payload, status=200)
 
@@ -64,18 +63,18 @@ class Slots(APIView):
         if user.is_staff:
             approved = models.Slot.objects.filter(is_booked=True)
             pending = models.Slot.objects.filter(is_booked=False)
-            # rejected = models.Slot.objects.all()
+            rejected = models.DeletedSlot.objects.all()
         else:
             approved = models.Slot.objects.filter(user=user, is_booked=True)
             pending = models.Slot.objects.filter(user=user, is_booked=False)
-            # rejected = models.Slot.objects.filter(user=user)
+            rejected = models.Slot.objects.filter(user=user)
         approved_serializer = serializers.SlotSerializer(approved, many=True)
         pending_serializer = serializers.SlotSerializer(pending, many=True)
-        # rejected_serializer = serializers.SlotSerializer(rejected, many=True)
+        rejected_serializer = serializers.DeletedSerializer(rejected, many=True)
         payload = {
             'approved': approved_serializer.data,
             'pending': pending_serializer.data,
-            # 'rejected': rejected_serializer.data
+            'rejected': rejected_serializer.data
         }
         return Response(payload)
 
@@ -100,12 +99,6 @@ class Slots(APIView):
         else:
             return Response({'message': 'You are not authorized to perform this action!'}, status=403)
 
-    def delete(self, request):
-        data = request.data
-        slot = models.Slot.objects.get(id=data.get('id'), user=request.user)
-        slot.delete()
-        return Response({'message': 'Slot deleted successfully!'})
-
 class SlotReqeusts(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
@@ -117,6 +110,25 @@ class SlotReqeusts(APIView):
         serializer = serializers.SlotSerializer(slots, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        try:
+            data = request.data
+            slot = models.Slot.objects.get(id=data.get('id'))
+            deleted_slot = models.DeletedSlot.objects.create(
+                date=slot.date,
+                start_time=slot.start_time,
+                end_time=slot.end_time,
+                payment_image=slot.payment_image,
+                user=slot.user,
+                request_time=slot.request_time,
+                reason=data.get('reason')
+            )
+            deleted_slot.save()
+            slot.delete()
+            return Response({'message': 'Slot deleted successfully!'})
+        except Exception as e:
+            return Response({'message': e}, status=404)
+
     def patch(self, request):
         if request.user.is_staff:
             data = request.data
@@ -124,27 +136,6 @@ class SlotReqeusts(APIView):
             slot.is_booked = True
             slot.save()
             return Response({'message': 'Slot booked successfully!'})
-        else:
-            return Response({'message': 'You are not authorized to perform this action!'}, status=403)
-
-    def delete(self, request):
-        if request.user.is_staff:
-            data = request.data
-            slot = models.Slot.objects.get(id=data.get('id'))
-            # shift this slot to new table called 'DeletedSlot'
-            # models.DeletedSlot.objects.create(
-            #     date=slot.date,
-            #     start_time=slot.start_time,
-            #     end_time=slot.end_time,
-            #     payment_image=slot.payment_image,
-            #     user=slot.user,
-            #     request_time=slot.request_time,
-            #     is_booked=slot.is_booked,
-            #     is_booked_time=slot.is_booked_time,
-            #     reason=data.get('reason')
-            # )
-            slot.delete()
-            return Response({'message': 'Slot deleted successfully!'})
         else:
             return Response({'message': 'You are not authorized to perform this action!'}, status=403)
 

@@ -20,8 +20,19 @@ class SlotSerializer(serializers.ModelSerializer):
         model = models.Slot
         fields = ['id','date','start_time','end_time','payment_image','user']
 
+class DeletedSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = models.DeletedSlot
+        fields = ['id','date','start_time','end_time','payment_image','user','reason','deletiontime']
+
 class UserSlotEditSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     class Meta:
         model = models.Slot
         fields = ['id','date','start_time','end_time']
+
+class DeletedSlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.DeletedSlot
+        fields = ['reason']
