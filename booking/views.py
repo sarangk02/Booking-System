@@ -6,6 +6,7 @@ from django.http import HttpResponse
 
 from . import serializers
 from . import models
+from . import emails
 
 class IndexView(APIView):
     def get(self, request):
@@ -138,6 +139,32 @@ class SlotReqeusts(APIView):
             return Response({'message': 'Slot booked successfully!'})
         else:
             return Response({'message': 'You are not authorized to perform this action!'}, status=403)
+
+class VerifyEmail(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        if user.email_verified == True:
+            return Response({'message': 'Contact already Verified successfully!'})
+        else:
+            emails.sendverificationcode(user.email)
+            return Response({'message': 'Verification code sent successfully!'})
+
+    def post(self, request):
+        user = request.user
+        if user.email_verified == True:
+            return Response({'message': 'Contact already Verified successfully!'})
+        else:
+            data = request.data
+            try:
+                if str(data.get('otp')) == str(emails.generate_verification_code(user.email)):
+                    user.email_verified = True
+                    user.save()
+                    return Response({'message': 'Email Verified successfully!'})
+                else:
+                    return Response({'message': 'Invalid verification code!'}, status=400)
+            except Exception as e:
+                return Response({'message': 'Error occured',"Error":e})
 
 # {
 #     "username": "sarangkulkarniii",

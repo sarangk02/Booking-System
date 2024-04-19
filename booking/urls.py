@@ -6,4 +6,5 @@ urlpatterns = [
     path('user/', views.UserEdit.as_view(), name='user-edit'),
     path('manage-slot/', views.Slots.as_view(), name = 'manage-slot'),
     path('slot-requests/', views.SlotReqeusts.as_view(), name = 'slot-requests'),
+    path('verify/email/', views.VerifyEmail.as_view(), name = 'verify-email'),
 ]

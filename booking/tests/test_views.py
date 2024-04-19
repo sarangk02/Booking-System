@@ -43,4 +43,3 @@ class TestViews(TestSetUp):
             self.client.credentials(HTTP_AUTHORIZATION=self.http_authorization)
             response = self.client.delete(self.user_url)
             self.assertEqual(response.status_code, 200)
-
