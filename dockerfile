@@ -1,4 +1,4 @@
-FROM python:3.10.0a7-slim-buster
+FROM python:3.10-slim-bullseye
 
 # Set the working directory
 WORKDIR /booking_system
@@ -7,6 +7,4 @@ WORKDIR /booking_system
 COPY . /booking_system
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+RUN pip install --no-cache-dir -r requirements.txt && python -m pip install --upgrade pip
