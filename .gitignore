@@ -34,3 +34,5 @@ local_settings.py
 
 # Ignore secret keys and sensitive information
 secret_key.txt
+
+smtp_password.txt
