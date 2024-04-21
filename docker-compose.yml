@@ -3,9 +3,15 @@ version: '1.0'
 services:
     web:
         build: .
-        command: python manage.py runserver 0.0.0.0:8000
-        ports:
-            - "8000:8000"
+        # command: python manage.py runserver 0.0.0.0:8000
+        command: gunicorn --bind 0.0.0.0:8000 system.wsgi:application
+        expose:
+            - 8000
+        volumes:
+            - .:/usr/src/app
+            - static_files:/usr/src/app/staticfiles
+        env_file:
+            - ./.env
         depends_on:
             - postgres
     postgres:
@@ -14,5 +20,22 @@ services:
             POSTGRES_USER: 'postgres'
             POSTGRES_PASSWORD: 'password'
             POSTGRES_DB: 'booking_db'
+        expose:
+            - 5432
+    nginx:
+        build: ./nginx
         ports:
-            - "5432:5432"
+            - "80:80"
+        volumes:
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - static_files:/home/app/staticfiles
+        depends_on:
+            - web
+
+volumes:
+    static_files:
+
+# python manage.py makemigrations
+# python manage.py migrate
+# python manage.py collectstatic
+# gunicorn --bind 0.0.0.0:8000 system.wsgi:application -w 4

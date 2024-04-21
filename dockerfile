@@ -1,10 +1,14 @@
 FROM python:3.10-slim-bullseye
 
-# Set the working directory
-WORKDIR /booking_system
+# Set environment variables
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
 
-# Copy the current directory contents into the container at /booking_system
-COPY . /booking_system
+# Set the working directory inside the container
+WORKDIR /usr/src/app
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt && python -m pip install --upgrade pip

@@ -174,7 +174,5 @@ class VerifyEmail(APIView):
 #     "contact": "9421062179",
 #     "emerg_name": "Shreyas Kulkarni",
 #     "emerg_contact": "9881074107",
-#     "gender": "M",
-#     "email_verified": False,
-#     "contact_verified": False
+#     "gender": "M"
 # }

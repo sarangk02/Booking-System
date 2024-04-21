@@ -2,6 +2,7 @@
 *.sqlite3
 
 # Ignore static files
+/static/
 /staticfiles/
 
 # Ignore media files
@@ -33,6 +34,4 @@ venv/
 local_settings.py
 
 # Ignore secret keys and sensitive information
-secret_key.txt
-
-smtp_password.txt
+.env
