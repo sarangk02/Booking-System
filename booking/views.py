@@ -23,15 +23,19 @@ class IndexView(APIView):
 
 class UserEdit(APIView):
     permission_classes = [IsAuthenticated]
+    # get user details
     def get(self, request):
         user = request.user
         serializer = serializers.UserSerializer(user)
         return Response(serializer.data)
 
+    # for post request, no need of any permission
     def get_permissions(self):
         if self.request.method == 'POST':
             return []
         return super().get_permissions()
+
+    # create a new user
     def post(self, request):
         data = request.data
         serializer = serializers.UserSerializer(data=data)
@@ -41,6 +45,7 @@ class UserEdit(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+    # update user details
     def patch(self, request):
         data = request.data
         user = models.CustomUser.objects.get(username=request.user)
@@ -52,6 +57,7 @@ class UserEdit(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
+    # delete user
     def delete(self, request):
         user = models.CustomUser.objects.get(username=request.user)
         user.delete()
@@ -59,6 +65,7 @@ class UserEdit(APIView):
 
 class Slots(APIView):
     permission_classes = [IsAuthenticated]
+    # get slots as per user and staff
     def get(self, request):
         user = request.user
         if user.is_staff:
@@ -79,6 +86,7 @@ class Slots(APIView):
         }
         return Response(payload)
 
+    # book a new slot
     def post(self, request):
         data = request.data
         data['user'] = request.user.id
@@ -88,6 +96,7 @@ class Slots(APIView):
             return Response({'Details':serializer.data, 'message':'Slot Request Sent successfully!'}, status=201)
         return Response(serializer.errors, status=400)
 
+    # update slot details (staff)
     def patch(self, request):
         if request.user.is_staff:
             data = request.data
@@ -102,6 +111,7 @@ class Slots(APIView):
 
 class SlotReqeusts(APIView):
     permission_classes = [IsAuthenticated]
+    # get slot requests as per user and staff
     def get(self, request):
         user = request.user
         if user.is_staff:
@@ -111,6 +121,7 @@ class SlotReqeusts(APIView):
         serializer = serializers.SlotSerializer(slots, many=True)
         return Response(serializer.data)
 
+    # book a slot (staff)
     def post(self, request):
         try:
             data = request.data
@@ -130,6 +141,7 @@ class SlotReqeusts(APIView):
         except Exception as e:
             return Response({'message': e}, status=404)
 
+    # delete slot (staff)
     def patch(self, request):
         if request.user.is_staff:
             data = request.data
@@ -142,6 +154,7 @@ class SlotReqeusts(APIView):
 
 class VerifyEmail(APIView):
     permission_classes = [IsAuthenticated]
+    # get verification code via email
     def get(self, request):
         user = request.user
         if user.email_verified == True:
@@ -150,6 +163,7 @@ class VerifyEmail(APIView):
             emails.sendverificationcode(user.email)
             return Response({'message': 'Verification code sent successfully!'})
 
+    # verify email via OTP
     def post(self, request):
         user = request.user
         if user.email_verified == True:
@@ -165,14 +179,3 @@ class VerifyEmail(APIView):
                     return Response({'message': 'Invalid verification code!'}, status=400)
             except Exception as e:
                 return Response({'message': 'Error occured',"Error":e})
-
-# {
-#     "username": "sarangkulkarniii",
-#     "password": "asdf@1234",
-#     "name": "Sarang Kulkarni",
-#     "email": "sarangakulkarni02@gmail.com",
-#     "contact": "9421062179",
-#     "emerg_name": "Shreyas Kulkarni",
-#     "emerg_contact": "9881074107",
-#     "gender": "M"
-# }
